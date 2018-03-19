@@ -1,117 +1,207 @@
-/*
-* Oscar Emiliano Cervantes del Valle A01332891
-* Alison Ricardo González Cortés A01064754
-* Alfredo Puente Vasconcelos A01332573
-* Irvin Uriel Mundo Rivera A01333820
+ï»¿/*
+Computer Graphics. TC3022.
+
+Basic TGA textures.
+Displays a textured OBJ.
 */
 
 #ifdef __APPLE__
-// See: http://lnx.cx/docs/opengl-in-xcode/
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
-#include <stdlib.h>
 #else
 #include "freeglut.h"
 #endif
+
 #include <stdio.h>
 #include <math.h>
+#include "glm.h"
 
-//#include "cWheel.h"
-//#include "cCar.h"
-#include "../header/cRobot.h"
+long		frames;
+long		time;
+long		timebase;
+float		fps;
+float		rotation;
+GLfloat*	global_ambient;
 
-//Wheel *w1, *w2, *w3, *w4;   //w points to an object of type Wheel
-//Car* car;	//Car ownes wheels
-Robot* robot;
+char		bufferFPS[11];	// For on-screen text.
 
-void init() // FOR GLUT LOOP
+GLMmodel*	sintel;
+
+float		sintel_pos[3];
+float		sintel_dims[3];
+float		radius;
+
+/*
+Display mode:
+0: Vertices.
+1: Flat.
+2: Smooth.
+3: Textured.
+*/
+int			mode;
+
+// Display text:
+void displayText(int x, int y, char* txt);
+
+void display(void)
 {
-	//car = new Car(0,1,0);
-	/*w1 = new Wheel(-1, 0, -1, 0, 1, 1);    //Deletes the memory and assings new values
-	w2 = new Wheel(-1, 0, 1, 0, 1, 1);
-	w3 = new Wheel(1, 0, -1, 0, 1, 1);
-	w4 = new Wheel(1, 0, 1, 0, 1, 1);*/
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	robot = new Robot();
-	glEnable(GL_DEPTH_TEST);            // Enable check for close and far objects.
-	glClearColor(0.3, 0.3, 0.3, 1.0);   // Clear the color state.
-	glMatrixMode(GL_MODELVIEW);         // Go to 3D mode.
-	glLoadIdentity();                   // Reset 3D view matrix.
+	glLoadIdentity();
+	gluLookAt(0, 1, 2, 0, 0, 0, 0, 1, 0);
+
+	displayText(5, 20, bufferFPS);
+
+	glutSwapBuffers();
 }
 
-void axes()
+void idle(void)
 {
-	glLineWidth(5);
-	glBegin(GL_LINES);
+	// Compute frames per second:
+	frames++;
+	time = glutGet(GLUT_ELAPSED_TIME);
+	if (time - timebase > 1000)
 	{
-		glColor3f(1, 0, 0);
-		glVertex3f(0, 0, 0);
-		glVertex3f(1, 0, 0);
-
-		glColor3f(0, 1, 0);
-		glVertex3f(0, 0, 0);
-		glVertex3f(0, 1, 0);
-
-		glColor3f(0, 0, 1);
-		glVertex3f(0, 0, 0);
-		glVertex3f(0, 0, 1);
+		fps = frames * 1000.0f / (time - timebase);
+		sprintf(bufferFPS, "FPS:%4.2f\n", fps);
+		timebase = time;
+		frames = 0;
 	}
-	glEnd();
-	glLineWidth(1);
+
+	rotation += 0.05f;
+	if (rotation > 360.0f)
+	{
+		rotation = 0.0f;
+	}
+	glutPostRedisplay();
 }
 
-void display()                            // Called for each frame (about 60 times per second).
+void reshape(int w, int h)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);                // Clear color and depth buffers.
-	//axes();
-	//car->draw();
-	/*w1->draw();    //Like point in Java
-	w2->draw();
-	w3->draw();
-	w4->draw();*/
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 
-	robot->draw();
-	glutSwapBuffers();                                                // Swap the hidden and visible buffers.
+	gluPerspective(60.0, w / h * 1.0, 0.01, 1024.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 }
 
-void idle()                                                            // Called when drawing is finished.
+void init(void)
 {
-	//car->update();
-	/*w1->update();
-	w2->update();
-	w3->update();
-	w4->update();*/
+	frames = 0;
+	time = 0;
+	timebase = 0;
+	fps = 0.0f;
+	rotation = 0.0f;
+	mode = 0;
+	radius = 0;
+	sintel_pos[0] = 0.0f;
+	sintel_pos[1] = 0.0f;
+	sintel_pos[2] = 0.0f;
 
-	robot->update();
-	glutPostRedisplay();                                            // Display again.
+	// 
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	GLfloat diffusel0[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat ambientl0[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat specularl0[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat position[4] = { 2.0f, 0.5f, 1.0f, 0.0f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientl0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffusel0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularl0);
+	glLightfv(GL_LIGHT0, GL_POSITION, position);
+
+	global_ambient = new GLfloat[4];
+	global_ambient[0] = 0.3f;
+	global_ambient[1] = 0.3f;
+	global_ambient[2] = 0.3f;
+	global_ambient[3] = 1.0f;
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 }
 
-void reshape(int x, int y)                                            // Called when the window geometry changes.
+void keyboard(unsigned char key, int x, int y)
 {
-	glMatrixMode(GL_PROJECTION);                                    // Go to 2D mode.
-	glLoadIdentity();                                                // Reset the 2D matrix.
-	gluPerspective(40.0, (GLdouble)x / (GLdouble)y, 0.5, 50.0);        // Configure the camera lens aperture.
-	glMatrixMode(GL_MODELVIEW);                                        // Go to 3D mode.
-	glLoadIdentity();                                                // Reset the 3D matrix.
-	glViewport(0, 0, x, y);                                            // Configure the camera frame dimensions.
-	gluLookAt(5.0, 5.0, 5.0,                                        // Where the camera is.
-		0.0, 0.0, 0.0,                                                // To where the camera points at.
-		0.0, 1.0, 0.0);                                                // "UP" vector.
-	display();
+	switch (key)
+	{
+	case '0':
+		mode = 0;
+		break;
+	case '1':
+		mode = 1;
+		break;
+	case '2':
+		mode = 2;
+		break;
+	case '3':
+		mode = 3;
+		break;
+	case 27:
+		//glmDelete( sintel );
+		//exit(0);
+		break;
+	}
 }
 
 int main(int argc, char* argv[])
 {
-	glutInit(&argc, argv);                                            // Init GLUT with command line parameters.
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);        // Use 2 buffers (hidden and visible). Use the depth buffer. Use 3 color channels.
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(800, 800);
-	glutCreateWindow("CG_DEMO");
-
+	glutInitWindowPosition(100, 10);
+	glutCreateWindow("SINTEL v.1.0.");
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(keyboard);
 	init();
-	glutReshapeFunc(reshape);                                        // Reshape CALLBACK function.
-	glutDisplayFunc(display);                                        // Display CALLBACK function.
-	glutIdleFunc(idle);                                                // Idle CALLBACK function.
-	glutMainLoop();                                                    // Begin graphics program.
-	return 0;                                                        // ANSI C requires a return value.
+	glutDisplayFunc(display);
+	glutIdleFunc(idle);
+	glutMainLoop();
+	return 0;
+}
+
+/*
+Displays characters stored in the "txt" array at position (x,y).
+*/
+void displayText(int x, int y, char* txt)
+{
+	GLboolean lighting;
+	GLint viewportCoords[4];
+	glColor3f(0.0, 1.0, 0.0);
+	glGetBooleanv(GL_LIGHTING, &lighting);
+	glGetIntegerv(GL_VIEWPORT, viewportCoords);
+	if (lighting)
+	{
+		glDisable(GL_LIGHTING);
+	}
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(0.0, viewportCoords[2], 0.0, viewportCoords[3]);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glRasterPos2i(x, viewportCoords[3] - y);
+	while (*txt)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *txt);
+		txt++;
+	}
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+
+	if (lighting)
+	{
+		glEnable(GL_LIGHTING);
+	}
 }
