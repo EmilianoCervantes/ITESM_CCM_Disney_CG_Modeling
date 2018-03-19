@@ -1,8 +1,5 @@
 ﻿/*
-Computer Graphics. TC3022.
-
-Basic TGA textures.
-Displays a textured OBJ.
+Oscar Emiliano Cervantes del Valle A01332891
 */
 
 #ifdef __APPLE__
@@ -39,7 +36,7 @@ Display mode:
 2: Smooth.
 3: Textured.
 */
-int			mode;
+int mode;
 
 // Display text:
 void displayText(int x, int y, char* txt);
@@ -50,6 +47,32 @@ void display(void)
 
 	glLoadIdentity();
 	gluLookAt(0, 1, 2, 0, 0, 0, 0, 1, 0);
+
+	//Edit
+	glPushMatrix();
+	{
+		glRotatef(rotation, 0.0f, 1.0f, 0.0f);
+		glTranslatef(sintel_pos[0], sintel_pos[1], sintel_pos[2]);
+
+		switch (mode)
+		{
+		case 0:
+			glmDraw(sintel, GLM_NONE);
+			break;
+		case 1:
+			glmDraw(sintel, GLM_FLAT);
+			break;
+		case 2:
+			glmDraw(sintel, GLM_SMOOTH);
+			break;
+		case 3:
+			glmDraw(sintel, GLM_SMOOTH | GLM_TEXTURE);
+			break;
+		default:
+			break;
+		}
+	}
+	glPopMatrix();
 
 	displayText(5, 20, bufferFPS);
 
@@ -101,7 +124,24 @@ void init(void)
 	sintel_pos[1] = 0.0f;
 	sintel_pos[2] = 0.0f;
 
-	// 
+	//Edit
+	sintel = glmReadOBJ("assets/Sintel_Lite257b.obj");
+	glmUnitize(sintel);
+	glmFacetNormals(sintel);
+	glmDimensions(sintel, sintel_dims);
+	float center[3] = {
+		sintel_pos[0] + sintel_dims[0] / 2.0f,
+		sintel_pos[1] + sintel_dims[1] / 2.0f,
+		sintel_pos[2] + sintel_dims[2] / 2.0f
+	};
+	radius = sqrt(
+		center[0] * center[0] +
+		center[1] * center[2] +
+		center[1] * center[2]
+	);
+
+	printf("SINTEL_DIMS={%.3f,%.3f,%.3f}\n", sintel_dims[0], sintel_dims[1], sintel_dims[2]);
+	printf("RADUIS=%.3f\n", radius);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
@@ -129,20 +169,21 @@ void init(void)
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 }
 
+//Se deben usar las teclas WASD para mover al coche
 void keyboard(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
-	case '0':
+	case 'w':
 		mode = 0;
 		break;
-	case '1':
+	case 'a':
 		mode = 1;
 		break;
-	case '2':
+	case 's':
 		mode = 2;
 		break;
-	case '3':
+	case 'd':
 		mode = 3;
 		break;
 	case 27:
