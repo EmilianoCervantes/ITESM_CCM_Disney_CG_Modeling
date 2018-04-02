@@ -27,7 +27,7 @@
 
 #include "../header/cCarro.h"
 
-Carro* carros[200];
+Carro* carros[370];
 
 GLfloat*    global_ambient;
 
@@ -39,9 +39,9 @@ void display( void )
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   glLoadIdentity();
-  gluLookAt(0, 80, 2, 0, 0, 0, 0, 1, 0);
+  gluLookAt(0, 90, 2, 0, 0, 0, 0, 1, 0);
 
-  for(int i = 0; i < 200; i++){
+  for(int i = 0; i < 370; i++){
     carros[i] -> draw();
   }
 
@@ -52,7 +52,7 @@ void display( void )
 void idle( void )
 {
     // Compute frames per second:
-    for(int i = 0; i < 200; i++){
+    for(int i = 0; i < 370; i++){
       carros[i] -> update();
     }
     glutPostRedisplay();
@@ -71,9 +71,9 @@ void reshape( int w, int h )
 
 void init( void )
 {
-  int contador = -4;
+  float contador = -4.0;
   //crear carros que están del lado de la reja blanca
-  for(int j = 0; j < 5; j++){
+  for(int j = 0; j < 8; j++){
     contador = -4;
     for(int i = 0; i<20; i+=2){
       carros[i+(20*j)] = new Carro(contador,0,0-(j*8),0);
@@ -83,7 +83,7 @@ void init( void )
   }
   //carros que están por los foodtrucks
   contador = -14;
-  for(int i = 100; i < 160; i+=3){
+  for(int i = 160; i < 220; i+=3){
     carros[i] = new Carro(contador,0,8,0);
     carros[i+1] = new Carro(-contador,0,-5.8,180);
     carros[i+2] = new Carro(-contador,0,-13.8,180);
@@ -91,11 +91,36 @@ void init( void )
   }
   //carros que están en la pate de atrás
   contador = -14;
-  for(int i = 160; i < 200; i+=2){
-    carros[i] = new Carro(contador,0,-40,0);
-    carros[i+1] = new Carro(-contador,0,42.2,180);
+  for(int i = 220; i < 260; i+=2){
+    carros[i] = new Carro(contador,0,-64,0);
+    carros[i+1] = new Carro(-contador,0,66.2,180);
     contador++;
   }
+
+  //carros que están a la derecha hasta enfrente
+  contador = -5;
+  for(int i = 260; i < 270; i+=2){
+    carros[i] = new Carro(contador+0.5,0,15.2,90);
+    carros[i+1] = new Carro(-contador-0.5,0,-13,270);
+    contador+=1.7;
+  }
+
+  //carros que están a la derecha después del  grupo anterior
+  contador = 10;
+  for(int i = 270; i < 330; i+=2){
+    carros[i] = new Carro(contador,0,15.2,90);
+    carros[i+1] = new Carro(-contador,0,-13,270);
+    contador+=1.7;
+  }
+
+  //carros de hasta la derecha
+  contador = 27;
+  for(int i = 330; i < 370; i+=2){
+    carros[i] = new Carro(contador,0,23.3,90);
+    carros[i+1] = new Carro(-contador,0,-21,270);
+    contador+=1.7;
+  }
+
 
 
 
