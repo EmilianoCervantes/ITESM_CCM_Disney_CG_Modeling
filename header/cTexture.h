@@ -1,15 +1,17 @@
 #pragma once
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+	#include <GLUT/glut.h>
 #else
-#include "freeglut.h"
+	#include "freeglut.h"
 #endif
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+
+#include <string.h>
 
 #ifndef __TGA_HEADER__
 #define __TGA_HEADER__
