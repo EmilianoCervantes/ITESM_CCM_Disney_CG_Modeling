@@ -9,7 +9,7 @@
 
 /*
  Computer Graphics. TC3022.
- 
+
  Basic TGA textures.
  Displays a textured OBJ.
  */
@@ -32,7 +32,7 @@ Carro* player;
 float playerRotation;
 float playerX, playerZ;
 float playerSpeed = 0.90f;
-
+GLMmodel*    sintel;
 GLfloat*    global_ambient;
 
 // Display text:
@@ -41,18 +41,18 @@ void displayText( int x, int y, char* txt );
 void display( void )
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    
+
     glLoadIdentity();
-    gluLookAt(0, 90, 2, 0, 0, 0, 0, 1, 0);
-    
+    gluLookAt(0, 40, 2, 0, 0, 0, 0, 1, 0);
+
     player -> draw();
-    
+
     for(int i = 0; i < 370; i++){
         carros[i] -> draw();
     }
-    
+
     glutSwapBuffers();
-    
+
 }
 
 void idle( void )
@@ -70,7 +70,7 @@ void reshape( int w, int h )
     glViewport( 0, 0, w, h );
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    
+
     gluPerspective( 60.0, w / h * 1.0, 0.01, 1024.0 );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
@@ -78,72 +78,74 @@ void reshape( int w, int h )
 
 void init( void )
 {
+  sintel = glmReadOBJ("./assets/car.obj");
     playerRotation = 180;
     playerX = 10;
     playerZ = 20;
-    player = new Carro(playerX, 0, playerZ, playerRotation);
-    
+    player = new Carro(playerX, 0, playerZ, playerRotation,sintel);
+
     float contador = -4.0;
     //crear carros que están del lado de la reja blanca
-    
+
     for(int j = 0; j < 8; j++){
         contador = -4;
         for(int i = 0; i<20; i+=2){
-            carros[i+(20*j)] = new Carro(contador,0,0-(j*8),0);
-            carros[i+1+(20*j)] = new Carro(-contador,0,2.2+(j*8),180);
+            carros[i+(20*j)] = new Carro(0+(j*8),0,contador,90,sintel);
+            carros[i+1+(20*j)] = new Carro(2.2-(j*8),0,-contador,270,sintel);
             contador++;
         }
     }
+
     //carros que están por los foodtrucks
     contador = -14;
     for(int i = 160; i < 220; i+=3){
-        carros[i] = new Carro(contador,0,8,0);
-        carros[i+1] = new Carro(-contador,0,-5.8,180);
-        carros[i+2] = new Carro(-contador,0,-13.8,180);
+        carros[i] = new Carro(-8,0,contador,90,sintel);
+        carros[i+1] = new Carro(5.8,0,-contador,270,sintel);
+        carros[i+2] = new Carro(13.8,0,-contador,270,sintel);
         contador++;
     }
     //carros que están en la pate de atrás
     contador = -14;
     for(int i = 220; i < 260; i+=2){
-        carros[i] = new Carro(contador,0,-64,0);
-        carros[i+1] = new Carro(-contador,0,66.2,180);
+        carros[i] = new Carro(64,0,contador,90,sintel);
+        carros[i+1] = new Carro(-66.2,0,-contador,270,sintel);
         contador++;
     }
-    
+
     //carros que están a la derecha hasta enfrente
     contador = -5;
     for(int i = 260; i < 270; i+=2){
-        carros[i] = new Carro(contador+0.5,0,15.2,90);
-        carros[i+1] = new Carro(-contador-0.5,0,-13,270);
+        carros[i] = new Carro(15.2,0,contador+0.5,0,sintel);
+        carros[i+1] = new Carro(-13,0,-contador-0.5,180,sintel);
         contador+=1.7;
     }
-    
+
     //carros que están a la derecha después del  grupo anterior
     contador = 10;
     for(int i = 270; i < 330; i+=2){
-        carros[i] = new Carro(contador,0,15.2,90);
-        carros[i+1] = new Carro(-contador,0,-13,270);
+        carros[i] = new Carro(15.2,0,-contador,0,sintel);
+        carros[i+1] = new Carro(-13,0,contador,180,sintel);
         contador+=1.7;
     }
-    
+
     //carros de hasta la derecha
     contador = 27;
     for(int i = 330; i < 370; i+=2){
-        carros[i] = new Carro(contador,0,23.3,90);
-        carros[i+1] = new Carro(-contador,0,-21,270);
+        carros[i] = new Carro(23.3,0,-contador,0,sintel);
+        carros[i+1] = new Carro(-21,0,contador,180,sintel);
         contador+=1.7;
     }
-    
-    
-    
-    
+
+
+
+
     glEnable( GL_DEPTH_TEST );
     glEnable( GL_TEXTURE_2D );
     glClearColor( 0.0, 0.0, 0.0, 0.0 );
-    
+
     glEnable( GL_LIGHTING );
     glEnable( GL_LIGHT0 );
-    
+
     GLfloat diffusel0[4]    = { 1.0f, 1.0f, 1.0f, 1.0f };
     GLfloat ambientl0[4]    = { 1.0f, 1.0f, 1.0f, 1.0f };
     GLfloat specularl0[4]    = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -152,7 +154,7 @@ void init( void )
     glLightfv( GL_LIGHT0, GL_DIFFUSE,   diffusel0  );
     glLightfv( GL_LIGHT0, GL_SPECULAR,  specularl0 );
     glLightfv( GL_LIGHT0, GL_POSITION,  position   );
-    
+
     global_ambient            = new GLfloat[4];
     global_ambient[0]        = 0.3f;
     global_ambient[1]        = 0.3f;
@@ -227,7 +229,7 @@ void displayText( int x, int y, char* txt )
     glMatrixMode( GL_PROJECTION );
     glPopMatrix();
     glMatrixMode( GL_MODELVIEW );
-    
+
     if( lighting )
     {
         glEnable( GL_LIGHTING );
