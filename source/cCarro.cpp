@@ -1,7 +1,7 @@
 #include "cCarro.h"
 
 
-Carro::Carro(float _x, float _y, float _z, float _f){
+Carro::Carro(float _x, float _y, float _z, float _f, GLMmodel* _sintel){
   frames            = 0;
   time            = 0;
   timebase        = 0;
@@ -11,13 +11,13 @@ Carro::Carro(float _x, float _y, float _z, float _f){
   sintel_pos[0]    = _x;
   sintel_pos[1]    = _y;
   sintel_pos[2]    = _z;
-  sintel = glmReadOBJ("/Users/AlisonGonzalez/Documents/Tec/8vo semestre/Gráficas computacionales/Proyecto/ITESM_CCM_Disney_CG_Modeling/carrogenerico/assets/L200-OBJ.obj");
-  glmUnitize(sintel);
-  glmFacetNormals(sintel);
-  glmDimensions(sintel, sintel_dims);
+  sintel = _sintel;
   float center[3] = {
       (sintel_pos[0] + sintel_dims[0])/2.0f, (sintel_pos[1] + sintel_dims[1])/2.0f,(sintel_pos[2] + sintel_dims[2])/2.0f
   };
+  glmUnitize(sintel);
+  glmFacetNormals(sintel);
+  glmDimensions(sintel, sintel_dims);
   radius = sqrt(center[0]*center[0]+center[1]*center[1]+center[2]*center[2]);
   printf("SINTEL_DIMS={%.3f,%.3f,%.3f}\n", sintel_dims[0],sintel_dims[1],sintel_dims[2]);
   printf("radius=%.3f\n", radius);
@@ -35,7 +35,7 @@ void Carro::draw(){
   glPushMatrix();
   glRotatef(rotation, 0.0f, 0.1f, 0.0f);
   glTranslatef(sintel_pos[0], sintel_pos[1], sintel_pos[2]);
-  glmDraw(sintel, GLM_SMOOTH);
+  glmDraw(sintel, GLM_SMOOTH|GLM_TEXTURE);
   glPopMatrix();
 
 

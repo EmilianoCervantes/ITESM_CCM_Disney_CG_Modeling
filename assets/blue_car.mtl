@@ -1,0 +1,7 @@
+newmtl Low_Poly_City_Cars:CAR_02
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.40 0.40 0.40
+Tf 1.00 1.00 1.00
+map_Kd blue_car.tga
+Ni 1.00
