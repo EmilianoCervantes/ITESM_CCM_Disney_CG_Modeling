@@ -43,12 +43,16 @@ void display( void )
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     glLoadIdentity();
-    gluLookAt(0, 40, 2, 0, 0, 0, 0, 1, 0);
+    gluLookAt(0, 140, 2, 0, 0, 0, 0, 1, 0);
 
     player -> draw();
 
     for(int i = 0; i < 370; i++){
-        carros[i] -> draw();
+        if(i == 198 || i == 311 || i == 95 || i == 113 || i == 2){
+          continue;
+        }else{
+          carros[i] -> draw();
+        }
     }
 
     glutSwapBuffers();
@@ -78,7 +82,7 @@ void reshape( int w, int h )
 
 void init( void )
 {
-  sintel = glmReadOBJ("./assets/car.obj");
+  sintel = glmReadOBJ("./assets/blue_car.obj");
     playerRotation = 180;
     playerX = 10;
     playerZ = 20;
