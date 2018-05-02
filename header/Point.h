@@ -1,11 +1,3 @@
-//
-//  Point.hpp
-//  Bezier
-//
-//  Created by MBG on 4/12/18.
-//  Copyright © 2018 MBG. All rights reserved.
-//
-
 #ifdef __APPLE__
 // See: http://lnx.cx/docs/opengl-in-xcode/
 #include <OpenGL/gl.h>

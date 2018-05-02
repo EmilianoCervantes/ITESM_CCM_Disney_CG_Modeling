@@ -1,11 +1,3 @@
-//
-//  Bezier.hpp
-//  Bezier
-//
-//  Created by MBG on 4/12/18.
-//  Copyright © 2018 MBG. All rights reserved.
-//
-
 #ifdef __APPLE__
 // See: http://lnx.cx/docs/opengl-in-xcode/
 #include <OpenGL/gl.h>
@@ -23,20 +15,21 @@
 #define Bezier_hpp
 
 #include <stdio.h>
-#include "Point.hpp"
+#include "Point.h"
+#include "cCarro.h"
 
 #endif /* Bezier_hpp */
-class Bezier{
+class Bezier {
 public:
-    Bezier (int deg, Point* points);
-    ~Bezier();
-    int factorial(int x);
-    float binomial(int n, int i);
-    Point evalBezier(float t);
-    void draw();
-    
-    Point* ctrlPoints; //control points;
-    int degree;
-    float* coefficients; // Array to pre-compute coefficient.
-    float tp; // time of point movement
+	Bezier(int deg, Point points[10]);
+	~Bezier();
+	int factorial(int x);
+	float binomial(int n, int i);
+	Point evalBezier(float t);
+	void draw();
+
+	Point* ctrlPoints; //control points;
+	int degree;
+	float* coefficients; // Array to pre-compute coefficient.
+	float tp; // time of point movement
 };

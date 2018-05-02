@@ -1,12 +1,4 @@
-//
-//  Point.cpp
-//  Bezier
-//
-//  Created by MBG on 4/12/18.
-//  Copyright © 2018 MBG. All rights reserved.
-//
-
-#include "Point.hpp"
+#include "Point.h"
 
 Point::Point()
 {
